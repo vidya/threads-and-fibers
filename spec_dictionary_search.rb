@@ -23,7 +23,13 @@ describe DictionarySearch do
   end
 
   it 'selects_reversible_words' do
-    rev_words_sample = ['ash', 'anon', 'alumni', 'sic', 'sure', 'claps', 'prism', 'pool', 'posse', 'rose']
+    rev_words_sample = []
+    rev_words_sample << ['ahs', 'ash']
+    rev_words_sample << ['alumin', 'alumni']
+    rev_words_sample << ['sci', 'sic']
+    rev_words_sample << ['nest', 'nets']
+    rev_words_sample << ['waist', 'waits']
+
     assert_empty (rev_words_sample - dict_search.reversible_suffix_words)
   end
 end

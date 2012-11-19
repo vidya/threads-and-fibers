@@ -16,3 +16,5 @@ gem 'google-api-client'
 
 gem 'eventmachine'
 gem 'em-http-request'
+
+gem "rspec"

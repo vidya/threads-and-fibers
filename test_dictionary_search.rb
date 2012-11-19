@@ -24,13 +24,13 @@ class TestDictionarySearch < MiniTest::Unit::TestCase
 
   def test_select_reversible_suffix_words
     rev_words = dict_search.select_reversible_suffix_words ['abc', 'acb', 'man']
-    assert_equal ['abc', 'acb'], rev_words, '--- error: cannot select reversible suffix words'
+    assert_equal [['abc', 'acb']], rev_words, '--- error: cannot select reversible suffix words'
 
     rev_words = dict_search.select_reversible_suffix_words ['abc', 'acb', 'man', 'mna']
-    assert_equal ['abc', 'acb', 'man', 'mna'], rev_words, '--- error: cannot select reversible suffix words'
+    assert_equal [['abc', 'acb'], ['man', 'mna']], rev_words, '--- error: cannot select reversible suffix words'
 
     rev_words = dict_search.select_reversible_suffix_words ['abc', 'acb', 'man', 'mna', 'bee']
-    assert_equal ['abc', 'acb', 'man', 'mna'], rev_words, '--- error: cannot select reversible suffix words'
+    assert_equal [['abc', 'acb'], ['man', 'mna']], rev_words, '--- error: cannot select reversible suffix words'
   end
 end
 

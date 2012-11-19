@@ -20,6 +20,8 @@ class DictionarySearch
   end
 
   def word_pairs
+    set_word_list_counts if reversible_suffix_words.empty?
+    reversible_suffix_words
   end
 
   def set_word_list_counts
@@ -33,8 +35,7 @@ class DictionarySearch
 
         rev_words             = select_reversible_suffix_words letter_segment[let]
 
-        reversible_suffix_words << rev_words
-        reversible_suffix_words.flatten!
+        rev_words.each { |rv| reversible_suffix_words << rv }
       end
     end
 

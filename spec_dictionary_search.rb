@@ -9,9 +9,8 @@ describe DictionarySearch do
 
   before do
     @dict_search        = DictionarySearch.new('wordsEn.txt')
-    @letter_segment     = dict_search.letter_segment
 
-    dict_search.set_word_list_counts
+    dict_search.word_pairs
   end
 
   it 'provides_count_of_words_starting_with_each_alphabet' do

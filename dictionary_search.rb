@@ -14,32 +14,20 @@ class DictionarySearch
     @alphabet_list    = ('a'..'z').to_a
 
     @letter_segment   = get_letter_segments
-    @word_count       = {}
+
+    @word_count = @letter_segment.inject({}) { |wc_hash, (k, v)| wc_hash[k] = v.size; wc_hash }
 
     @reversible_suffix_words = []
   end
 
   def word_pairs
-    set_word_list_counts if reversible_suffix_words.empty?
-    reversible_suffix_words
-  end
+    if reversible_suffix_words.empty?
+      thread_list = alphabet_list.inject({}) { |h, let| h[let] = thread_start letter_segment[let]; h }
 
-  def set_word_list_counts
-    thread_list        = {}
-
-    alphabet_list.each do |let|
-      thread_list[let]        = Thread.start(let) do
-
-        letter_segment[let]   = delete_tiny_words letter_segment[let]
-        word_count[let]       = letter_segment[let].size
-
-        rev_words             = select_reversible_suffix_words letter_segment[let]
-
-        rev_words.each { |rv| reversible_suffix_words << rv }
-      end
+      thread_list.each_value { |thr| thread_value_append thr }
     end
 
-    thread_list.each_value { |thr| thr.join }
+    reversible_suffix_words
   end
 
   #--- private ------------------------------------------------------------------------------
@@ -54,5 +42,13 @@ class DictionarySearch
 
       let_seg_hash
     end
+  end
+
+  def thread_start(list)
+    Thread.start(list) { select_reversible_suffix_words delete_tiny_words(list) }
+  end
+
+  def thread_value_append(thr)
+    thr.value.each { |rv| reversible_suffix_words << rv }
   end
 end

@@ -24,7 +24,7 @@ class FiberDictionarySearch
     if reversible_suffix_words.empty?
       fiber_list = alphabet_list.inject({}) { |h, let| h[let] = fiber_create letter_segment[let]; h }
 
-      fiber_list.each_value { |thr| fiber_value_append thr }
+      fiber_list.each_value { |f| f.resume }
     end
 
     reversible_suffix_words
@@ -45,10 +45,10 @@ class FiberDictionarySearch
   end
 
   def fiber_create(list)
-    Fiber.new { Fiber.yield(select_reversible_suffix_words delete_tiny_words(list)) }
-  end
+    Fiber.new do
+      rv_list = select_reversible_suffix_words delete_tiny_words(list)
 
-  def fiber_value_append(fiber)
-    fiber.resume.each { |rv| reversible_suffix_words << rv }
+      rv_list.each { |rv| reversible_suffix_words << rv }
+    end
   end
 end

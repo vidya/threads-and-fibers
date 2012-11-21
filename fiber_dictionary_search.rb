@@ -6,13 +6,12 @@ require './lib_dictionary_search'
 class FiberWorker
   include LibDictionarySearch
 
-  attr_accessor :fib, :let_list, :reversible_suffix_words,:letter_segment
+  attr_accessor :fib, :let_list,:letter_segment
 
-  def initialize(let_list, letter_segment, reversible_suffix_words)
+  def initialize(let_list, letter_segment)
     @let_list = let_list
     @fib = Fiber.new {}
     @letter_segment = letter_segment
-    @reversible_suffix_words = reversible_suffix_words
   end
 
   def continue_work
@@ -20,20 +19,14 @@ class FiberWorker
     let = @let_list.pop
     @let_list = @let_list[0..-1]
 
-    puts "76 let = #{let}"
+    puts "bu76 let = #{let}"
     return nil if let.nil?
 
-    rv_list = select_reversible_suffix_words delete_tiny_words(@letter_segment[let])
-
-    rv_list.each { |rv| @reversible_suffix_words << rv }
-
-    yield 9
+    yield  select_reversible_suffix_words delete_tiny_words(@letter_segment[let])
   end
 end
 
 class FiberDictionarySearch
-  include LibDictionarySearch
-
   attr_accessor :dict, :letter_segment, :word_count, :alphabet_list, :reversible_suffix_words
 
   def initialize(file_path)
@@ -50,19 +43,14 @@ class FiberDictionarySearch
 
   def word_pairs
     if reversible_suffix_words.empty?
-      #fiber_list = alphabet_list.inject({}) { |h, let| h[let] = fiber_create letter_segment[let]; h }
-      #
-      #fiber_list.each_value { |f| f.resume }
-
-      fw1 = FiberWorker.new ('a'..'h').to_a, letter_segment, reversible_suffix_words
-      fw2 = FiberWorker.new ('i'..'r').to_a, letter_segment, reversible_suffix_words
-      fw3 = FiberWorker.new ('s'..'z').to_a, letter_segment, reversible_suffix_words
+      fw1 = FiberWorker.new ('a'..'h').to_a, letter_segment
+      fw2 = FiberWorker.new ('i'..'r').to_a, letter_segment
+      fw3 = FiberWorker.new ('s'..'z').to_a, letter_segment
 
       while true
-        #puts 'in loop'
-        rv1 = fw1.continue_work {|x| x} #sleep 0.01}
-        rv2 = fw2.continue_work { |x| x} #sleep 0.01}
-        rv3 = fw3.continue_work {|x| x} #sleep 0.01}
+        rv1 = fw1.continue_work { |rv_list| append_rv_list rv_list }
+        rv2 = fw2.continue_work { |rv_list| append_rv_list rv_list }
+        rv3 = fw3.continue_work { |rv_list| append_rv_list rv_list }
 
         break unless (rv1 || rv2 || rv3)
       end
@@ -85,11 +73,7 @@ class FiberDictionarySearch
     end
   end
 
-  def fiber_create(list)
-    Fiber.new do
-      rv_list = select_reversible_suffix_words delete_tiny_words(list)
-
-      rv_list.each { |rv| reversible_suffix_words << rv }
-    end
+  def append_rv_list(rv_list)
+    rv_list.each { |rv| reversible_suffix_words << rv }
   end
 end

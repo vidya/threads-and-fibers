@@ -4,52 +4,9 @@ require 'fiber'
 
 require './lib_dictionary_search'
 
-#class FiberWorker #< Fiber
-#  include LibDictionarySearch
-#
-#  attr_accessor :fib, :let_list,:letter_segment
-#
-#  def initialize(let_list, letter_segment)
-#    @let_list = let_list
-#    #@fib = Fiber.new {}
-#    @letter_segment = letter_segment
-#
-#    #binding.pry
-#    @fib = Fiber.new do
-#      return nil if @let_list.empty?
-#
-#      let, @let_list = @let_list.pop, @let_list[0..-1]
-#      puts "let = #{let}"
-#
-#      #yield
-#      yield select_reversible_suffix_words delete_tiny_words(@letter_segment[let])
-#    end
-#  end
-#
-#  def continue_work(&block)
-#    @fib ||= Fiber.new do
-#      return nil if @let_list.empty?
-#
-#      let, @let_list = @let_list.pop, @let_list[0..-1]
-#      puts "let = #{let}"
-#
-#      yield  select_reversible_suffix_words delete_tiny_words(@letter_segment[let])
-#    end
-#
-#    @fib.resume(&block)
-#  end
-#
-#  #def continue_work
-#  #  return nil if @let_list.empty?
-#  #
-#  #  let, @let_list = @let_list.pop, @let_list[0..-1]
-#  #
-#  #  yield  select_reversible_suffix_words delete_tiny_words(@letter_segment[let])
-#  #end
-#end
-
 class FiberDictionarySearch
   include LibDictionarySearch
+
   attr_accessor :dict, :letter_segment, :word_count, :alphabet_list, :reversible_suffix_words
 
   def initialize(file_path)
@@ -69,7 +26,7 @@ class FiberDictionarySearch
 
       list1 = ('a'..'h').to_a
       fw1 = Fiber.new do
-        while not list1.empty?
+        until list1.empty?
           let, list1 = list1.pop, list1[0..-1]
           puts "let = #{let}"
 
@@ -79,20 +36,17 @@ class FiberDictionarySearch
 
       list2 = ('i'..'r').to_a
       fw2 = Fiber.new do
-        while not list2.empty?
-
-         let, list2 = list2.pop, list2[0..-1]
+        until list2.empty?
+          let, list2 = list2.pop, list2[0..-1]
           puts "let = #{let}"
 
           Fiber.yield select_reversible_suffix_words delete_tiny_words(@letter_segment[let])
         end
-
       end
 
       list3 = ('s'..'z').to_a
       fw3 = Fiber.new do
-        while not list3.empty?
-
+        until list3.empty?
           let, list3 = list3.pop, list3[0..-1]
           puts "let = #{let}"
 

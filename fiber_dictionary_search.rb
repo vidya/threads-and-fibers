@@ -9,8 +9,6 @@ class FiberDictionarySearch
   attr_accessor :dict, :letter_segment, :word_count, :alphabet_list, :reversible_suffix_words
 
   def initialize(file_path)
-    puts "fiber_demo: start 89"
-
     @dict             = read_data file_path
 
     @alphabet_list    = ('a'..'z').to_a

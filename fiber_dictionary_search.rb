@@ -23,41 +23,18 @@ class FiberDictionarySearch
 
   def word_pairs
     if reversible_suffix_words.empty?
+      fw1 = create_fiber
+      fw2 = create_fiber
+      fw3 = create_fiber
 
       list1 = ('a'..'h').to_a
-      fw1 = Fiber.new do
-        until list1.empty?
-          let, list1 = list1.pop, list1[0..-1]
-          puts "let = #{let}"
-
-          Fiber.yield select_reversible_suffix_words delete_tiny_words(@letter_segment[let])
-        end
-      end
-
       list2 = ('i'..'r').to_a
-      fw2 = Fiber.new do
-        until list2.empty?
-          let, list2 = list2.pop, list2[0..-1]
-          puts "let = #{let}"
-
-          Fiber.yield select_reversible_suffix_words delete_tiny_words(@letter_segment[let])
-        end
-      end
-
       list3 = ('s'..'z').to_a
-      fw3 = Fiber.new do
-        until list3.empty?
-          let, list3 = list3.pop, list3[0..-1]
-          puts "let = #{let}"
-
-          Fiber.yield select_reversible_suffix_words delete_tiny_words(@letter_segment[let])
-        end
-      end
 
       while true
-        rv1 = fw1.resume(rv1) if fw1.alive?
-        rv2 = fw2.resume(rv2) if fw2.alive?
-        rv3 = fw3.resume(rv3) if fw3.alive?
+        list1, rv1 = fw1.resume(list1) if fw1.alive?
+        list2, rv2 = fw2.resume(list2) if fw2.alive?
+        list3, rv3 = fw3.resume(list3) if fw3.alive?
 
         append_rv_list rv1 unless rv1.nil?
         append_rv_list rv2 unless rv2.nil?
@@ -86,5 +63,16 @@ class FiberDictionarySearch
 
   def append_rv_list(rv_list)
     rv_list.each { |rv| reversible_suffix_words << rv }
+  end
+
+  def create_fiber
+    Fiber.new do |list|
+      until list.empty?
+        let = list.pop
+        puts "let = #{let}"
+
+        Fiber.yield list[0..-1], select_reversible_suffix_words(delete_tiny_words @letter_segment[let])
+      end
+    end
   end
 end

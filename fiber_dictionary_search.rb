@@ -7,7 +7,7 @@ require './lib_dictionary_search'
 class FiberDictionarySearch
   include LibDictionarySearch
 
-  attr_accessor :dict, :letter_segment, :word_count, :alphabet_list, :reversible_suffix_words
+  attr_accessor :dict, :letter_segment, :alphabet_list, :reversible_suffix_words
 
   def initialize(file_path)
     @dict             = read_data file_path
@@ -15,8 +15,6 @@ class FiberDictionarySearch
     @alphabet_list    = ('a'..'z').to_a
 
     @letter_segment   = get_letter_segments
-
-    @word_count = @letter_segment.inject({}) { |wc_hash, (k, v)| wc_hash[k] = v.size; wc_hash }
 
     @reversible_suffix_words = []
   end
